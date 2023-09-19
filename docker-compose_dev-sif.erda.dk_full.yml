@@ -1,3 +1,4 @@
+# docker-compose version
 version: '3.7'
 
 services:
@@ -26,7 +27,7 @@ services:
 
   migrid:
     container_name: migrid
-    image: ucphhpc/migrid:$BUILD_TYPE
+    image: ucphhpc/migrid${CONTAINER_TAG}
     network_mode: "host"
     build:
       context: ./
@@ -36,8 +37,6 @@ services:
         DOCKER_MIGRID_ROOT: ${DOCKER_MIGRID_ROOT:-.}
         UID: ${UID:-1000}
         GID: ${GID:-1000}
-        BUILD_TYPE: ${BUILD_TYPE}
-        BUILD_TARGET: ${BUILD_TARGET}
         DOMAIN: ${DOMAIN}
         WILDCARD_DOMAIN: ${WILDCARD_DOMAIN}
         PUBLIC_DOMAIN: ${PUBLIC_DOMAIN}
@@ -167,17 +166,6 @@ services:
       #   httpd script monitor sshmux events cron transfers
       #   openid sftp sftpsubsys webdavs ftps notify imnotify vmproxy
       RUN_SERVICES: httpd script monitor sshmux events cron transfers imnotify vmproxy crond rsyslogd
-    # NOTE: devdns not used in stand-alone mode
-    #depends_on:
-    #  - devdns
-    #networks:
-    #  default:
-    #    aliases:
-    #      - dev-www.erda.dk
-    #      - dev-cert.erda.dk
-    #      - dev-ext.erda.dk
-    #      - dev-oid.erda.dk
-    #      - dev-sid.erda.dk
     volumes:
       - type: volume
         source: httpd
@@ -205,7 +193,7 @@ services:
   # Multiple containers with individual daemons not provided by base migrid
   migrid-openid:
     container_name: migrid-openid
-    image: ucphhpc/migrid:$BUILD_TYPE
+    image: ucphhpc/migrid${CONTAINER_TAG}
     network_mode: "host"
     build:
       context: ./
@@ -215,8 +203,6 @@ services:
         DOCKER_MIGRID_ROOT: ${DOCKER_MIGRID_ROOT:-.}
         UID: ${UID:-1000}
         GID: ${GID:-1000}
-        BUILD_TYPE: ${BUILD_TYPE}
-        BUILD_TARGET: ${BUILD_TARGET}
         DOMAIN: ${DOMAIN}
         WILDCARD_DOMAIN: ${WILDCARD_DOMAIN}
         PUBLIC_DOMAIN: ${PUBLIC_DOMAIN}
@@ -351,10 +337,6 @@ services:
     #ports:
     #  # NOTE: expose the unique raw port(s) to host 
     #  - "8443:8443"
-    #networks:
-    #  default:
-    #    aliases:
-    #      - dev-openid.erda.dk
     volumes:
       - type: volume
         source: httpd
@@ -375,7 +357,7 @@ services:
 
   migrid-sftp:
     container_name: migrid-sftp
-    image: ucphhpc/migrid:$BUILD_TYPE
+    image: ucphhpc/migrid${CONTAINER_TAG}
     network_mode: "host"
     build:
       context: ./
@@ -385,8 +367,6 @@ services:
         DOCKER_MIGRID_ROOT: ${DOCKER_MIGRID_ROOT:-.}
         UID: ${UID:-1000}
         GID: ${GID:-1000}
-        BUILD_TYPE: ${BUILD_TYPE}
-        BUILD_TARGET: ${BUILD_TARGET}
         DOMAIN: ${DOMAIN}
         WILDCARD_DOMAIN: ${WILDCARD_DOMAIN}
         PUBLIC_DOMAIN: ${PUBLIC_DOMAIN}
@@ -522,10 +502,6 @@ services:
     #  # NOTE: expose the unique raw port(s) to host 
     #  - "2222:2222"
     #  - "22222:22222"
-    #networks:
-    #  default:
-    #    aliases:
-    #      - dev-sftp.erda.dk
     volumes:
       - type: volume
         source: httpd
@@ -548,7 +524,7 @@ services:
 
   migrid-ftps:
     container_name: migrid-ftps
-    image: ucphhpc/migrid:$BUILD_TYPE
+    image: ucphhpc/migrid${CONTAINER_TAG}
     network_mode: "host"
     build:
       context: ./
@@ -558,8 +534,6 @@ services:
         DOCKER_MIGRID_ROOT: ${DOCKER_MIGRID_ROOT:-.}
         UID: ${UID:-1000}
         GID: ${GID:-1000}
-        BUILD_TYPE: ${BUILD_TYPE}
-        BUILD_TARGET: ${BUILD_TARGET}
         DOMAIN: ${DOMAIN}
         WILDCARD_DOMAIN: ${WILDCARD_DOMAIN}
         PUBLIC_DOMAIN: ${PUBLIC_DOMAIN}
@@ -645,7 +619,7 @@ services:
         ENABLE_MIGADMIN: ${ENABLE_MIGADMIN}
         ENABLE_GDP: ${ENABLE_GDP}
         ENABLE_TWOFACTOR: ${ENABLE_TWOFACTOR}
-        ENABLE_TWOFACTOR_STRICT_ADDRESS: ${ENABLE_TWOFACTOR_STRICT_ADDRESS}  
+        ENABLE_TWOFACTOR_STRICT_ADDRESS: ${ENABLE_TWOFACTOR_STRICT_ADDRESS}
         ENABLE_PEERS: ${ENABLE_PEERS}
         MIG_PASSWORD_POLICY: ${MIG_PASSWORD_POLICY}
         ENABLE_LOGROTATE: ${ENABLE_LOGROTATE}
@@ -694,11 +668,6 @@ services:
     #ports:
     #  # NOTE: expose the unique raw port(s) to host 
     #  - "8021:8021"
-    #  - "8100-8399:8100-8399"
-    #networks:
-    #  default:
-    #    aliases:
-    #      - dev-ftps.erda.dk
     volumes:
       - type: volume
         source: httpd
@@ -721,7 +690,7 @@ services:
 
   migrid-webdavs:
     container_name: migrid-webdavs
-    image: ucphhpc/migrid:$BUILD_TYPE
+    image: ucphhpc/migrid${CONTAINER_TAG}
     network_mode: "host"
     build:
       context: ./
@@ -731,8 +700,6 @@ services:
         DOCKER_MIGRID_ROOT: ${DOCKER_MIGRID_ROOT:-.}
         UID: ${UID:-1000}
         GID: ${GID:-1000}
-        BUILD_TYPE: ${BUILD_TYPE}
-        BUILD_TARGET: ${BUILD_TARGET}
         DOMAIN: ${DOMAIN}
         WILDCARD_DOMAIN: ${WILDCARD_DOMAIN}
         PUBLIC_DOMAIN: ${PUBLIC_DOMAIN}
@@ -867,10 +834,6 @@ services:
     #ports:
     #  # NOTE: expose the unique raw port(s) to host 
     #  - "4443:4443"
-    #networks:
-    #  default:
-    #    aliases:
-    #      - dev-webdavs.erda.dk
     volumes:
       - type: volume
         source: httpd
@@ -908,18 +871,9 @@ services:
 #    #  - "443:443"
 #    volumes:
 #      - /var/run/docker.sock:/tmp/docker.sock:ro
-#      - ./nginx-proxy-dev.erda.dk.conf:/etc/nginx/conf.d/migrid.conf
+#      - ./nginx-proxy-production.conf:/etc/nginx/conf.d/migrid.conf
 #      - ./nginx-harden-https.conf:/etc/nginx/harden-https.conf
-#      - ./certs/MiG/dev*.erda.dk/server.crt:/etc/nginx/certs/dev-www.erda.dk.crt
-#      - ./certs/MiG/dev*.erda.dk/server.crt:/etc/nginx/certs/dev-cert.erda.dk.crt
-#      - ./certs/MiG/dev*.erda.dk/server.crt:/etc/nginx/certs/dev-ext.erda.dk.crt
-#      - ./certs/MiG/dev*.erda.dk/server.crt:/etc/nginx/certs/dev-oid.erda.dk.crt
-#      - ./certs/MiG/dev*.erda.dk/server.crt:/etc/nginx/certs/dev-sid.erda.dk.crt
-#      - ./certs/MiG/dev*.erda.dk/server.key:/etc/nginx/certs/dev-www.erda.dk.key
-#      - ./certs/MiG/dev*.erda.dk/server.key:/etc/nginx/certs/dev-cert.erda.dk.key
-#      - ./certs/MiG/dev*.erda.dk/server.key:/etc/nginx/certs/dev-ext.erda.dk.key
-#      - ./certs/MiG/dev*.erda.dk/server.key:/etc/nginx/certs/dev-oid.erda.dk.key
-#      - ./certs/MiG/dev*.erda.dk/server.key:/etc/nginx/certs/dev-sid.erda.dk.key
+#      - ./certs/MiG/site/server.crt:/etc/nginx/certs/server.crt
 #      - ./certs/dhparams.pem:/etc/nginx/dhparam/dhparam.pem
 
 volumes:
