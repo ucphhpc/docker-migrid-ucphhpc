@@ -165,7 +165,7 @@ services:
       # Available target service names follow migrid init script and are:
       #   httpd script monitor sshmux events cron transfers
       #   openid sftp sftpsubsys webdavs ftps notify imnotify vmproxy
-      RUN_SERVICES: httpd script monitor sshmux events cron transfers imnotify vmproxy crond rsyslogd
+      RUN_SERVICES: httpd script monitor sshmux events cron transfers imnotify vmproxy notify crond rsyslogd
     volumes:
       - type: volume
         source: httpd
@@ -876,16 +876,7 @@ services:
 #      - /var/run/docker.sock:/tmp/docker.sock:ro
 #      - ./nginx-proxy-bench.erda.dk.conf:/etc/nginx/conf.d/migrid.conf
 #      - ./nginx-harden-https.conf:/etc/nginx/harden-https.conf
-#      - ./certs/MiG/bench*.erda.dk/server.crt:/etc/nginx/certs/bench-www.erda.dk.crt
-#      - ./certs/MiG/bench*.erda.dk/server.crt:/etc/nginx/certs/bench-cert.erda.dk.crt
-#      - ./certs/MiG/bench*.erda.dk/server.crt:/etc/nginx/certs/bench-ext.erda.dk.crt
-#      - ./certs/MiG/bench*.erda.dk/server.crt:/etc/nginx/certs/bench-oid.erda.dk.crt
-#      - ./certs/MiG/bench*.erda.dk/server.crt:/etc/nginx/certs/bench-sid.erda.dk.crt
-#      - ./certs/MiG/bench*.erda.dk/server.key:/etc/nginx/certs/bench-www.erda.dk.key
-#      - ./certs/MiG/bench*.erda.dk/server.key:/etc/nginx/certs/bench-cert.erda.dk.key
-#      - ./certs/MiG/bench*.erda.dk/server.key:/etc/nginx/certs/bench-ext.erda.dk.key
-#      - ./certs/MiG/bench*.erda.dk/server.key:/etc/nginx/certs/bench-oid.erda.dk.key
-#      - ./certs/MiG/bench*.erda.dk/server.key:/etc/nginx/certs/bench-sid.erda.dk.key
+#      - ./certs/MiG/site/server.crt:/etc/nginx/certs/server.crt
 #      - ./certs/dhparams.pem:/etc/nginx/dhparam/dhparam.pem
 
 volumes:
