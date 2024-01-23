@@ -133,6 +133,9 @@ services:
     container_name: migrid-sftp
     image: ucphhpc/migrid${CONTAINER_TAG}
     network_mode: "host"
+    cap_add:
+      # Required by MiG OpenSSH sftpsubsys auth
+      - AUDIT_WRITE
     environment:
       TZ: ${TZ}
       # RUN_SERVICES specifies which daemons to launch
