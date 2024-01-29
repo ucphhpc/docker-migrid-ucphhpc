@@ -68,7 +68,7 @@ services:
         target: /home/mig/state/vgrid_files_writable
       - type: volume
         source: vgrid_files_readonly
-        target: /home/mig/state/vgrid_files_readonly
+        target: /home/mig/state/vgrid_files_readonly:ro
       - type: volume
         source: migrid-syslog
         target: /var/log
@@ -123,7 +123,7 @@ services:
         target: /home/mig/state/vgrid_files_writable
       - type: volume
         source: vgrid_files_readonly
-        target: /home/mig/state/vgrid_files_readonly
+        target: /home/mig/state/vgrid_files_readonly:ro
       - type: volume
         source: migrid-openid-syslog
         target: /var/log
@@ -179,7 +179,7 @@ services:
         target: /home/mig/state/vgrid_files_writable
       - type: volume
         source: vgrid_files_readonly
-        target: /home/mig/state/vgrid_files_readonly
+        target: /home/mig/state/vgrid_files_readonly:ro
       - type: volume
         source: migrid-sftp-syslog
         target: /var/log
@@ -231,7 +231,7 @@ services:
         target: /home/mig/state/vgrid_files_writable
       - type: volume
         source: vgrid_files_readonly
-        target: /home/mig/state/vgrid_files_readonly
+        target: /home/mig/state/vgrid_files_readonly:ro
       - type: volume
         source: migrid-ftps-syslog
         target: /var/log
@@ -283,7 +283,7 @@ services:
         target: /home/mig/state/vgrid_files_writable
       - type: volume
         source: vgrid_files_readonly
-        target: /home/mig/state/vgrid_files_readonly
+        target: /home/mig/state/vgrid_files_readonly:ro
       - type: volume
         source: migrid-webdavs-syslog
         target: /var/log
@@ -385,15 +385,15 @@ volumes:
       o: bind
 
   vgrid_files_readonly:
-    # Volume used to contain the migrid vgrid_files_home
+    # Volume used to contain the migrid vgrid_files_readonly
     driver: local
     driver_opts:
       type: none
       device: ${DOCKER_MIGRID_ROOT}/storage/vgrid_files_readonly
-      o: bind,ro
+      o: bind
 
   migrid-syslog:
-    # Volume used for exposing migrid system log
+    # Volume used for exposing migrid log
     driver: local
     driver_opts:
       type: none
