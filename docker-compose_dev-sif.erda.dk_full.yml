@@ -393,7 +393,7 @@ volumes:
       o: bind
 
   migrid-syslog:
-    # Volume used for exposing migrid log
+    # Volume used for exposing migrid container system log
     driver: local
     driver_opts:
       type: none
@@ -401,7 +401,7 @@ volumes:
       o: bind
 
   migrid-io-syslog:
-    # Volume used for exposing migrid system log
+    # Volume used for exposing migrid io container system log
     driver: local
     driver_opts:
       type: none
@@ -409,7 +409,7 @@ volumes:
       o: bind
 
   migrid-openid-syslog:
-    # Volume used for exposing migrid system log
+    # Volume used for exposing migrid openid container system log
     driver: local
     driver_opts:
       type: none
@@ -417,7 +417,7 @@ volumes:
       o: bind
 
   migrid-sftp-syslog:
-    # Volume used for exposing migrid system log
+    # Volume used for exposing migrid sftp container system log
     driver: local
     driver_opts:
       type: none
@@ -425,7 +425,7 @@ volumes:
       o: bind
 
   migrid-webdavs-syslog:
-    # Volume used for exposing migrid system log
+    # Volume used for exposing migrid webdavs container system log
     driver: local
     driver_opts:
       type: none
@@ -433,7 +433,7 @@ volumes:
       o: bind
 
   migrid-ftps-syslog:
-    # Volume used for exposing migrid system log
+    # Volume used for exposing migrid ftps log
     driver: local
     driver_opts:
       type: none
