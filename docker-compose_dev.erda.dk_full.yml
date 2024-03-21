@@ -50,13 +50,16 @@ services:
         source: certs
         target: /etc/httpd/MiG-certificates
       - type: volume
-        source: state
-        target: /home/mig/state
-      - type: volume
         source: migrid-syslog
         target: /var/log
+      - type: volume
+        source: state
+        target: /home/mig/state
       # NOTE: for read-only vgrids/workgroups we need a local 'ro' bind-mount
-      - ./state/vgrid_files_writable:/home/mig/state/vgrid_files_readonly:ro
+      - type: volume
+        source: vgrid_files_readonly
+        target: /home/mig/state/vgrid_files_readonly
+        read_only: true
     env_file:
       - migrid-httpd.env
     command: /app/docker-entry.sh -k -V
@@ -89,11 +92,16 @@ services:
         source: certs
         target: /etc/httpd/MiG-certificates
       - type: volume
-        source: state
-        target: /home/mig/state
-      - type: volume
         source: migrid-openid-syslog
         target: /var/log
+      - type: volume
+        source: state
+        target: /home/mig/state
+      # NOTE: for read-only vgrids/workgroups we need a local 'ro' bind-mount
+      - type: volume
+        source: vgrid_files_readonly
+        target: /home/mig/state/vgrid_files_readonly
+        read_only: true
     command: /app/docker-entry.sh -k
 
   migrid-sftp:
@@ -124,13 +132,16 @@ services:
         source: certs
         target: /etc/httpd/MiG-certificates
       - type: volume
-        source: state
-        target: /home/mig/state
-      - type: volume
         source: migrid-sftp-syslog
         target: /var/log
+      - type: volume
+        source: state
+        target: /home/mig/state
       # NOTE: for read-only vgrids/workgroups we need a local 'ro' bind-mount
-      - ./state/vgrid_files_writable:/home/mig/state/vgrid_files_readonly:ro
+      - type: volume
+        source: vgrid_files_readonly
+        target: /home/mig/state/vgrid_files_readonly
+        read_only: true
     command: /app/docker-entry.sh -k
 
   migrid-ftps:
@@ -160,13 +171,16 @@ services:
         source: certs
         target: /etc/httpd/MiG-certificates
       - type: volume
-        source: state
-        target: /home/mig/state
-      - type: volume
         source: migrid-ftps-syslog
         target: /var/log
+      - type: volume
+        source: state
+        target: /home/mig/state
       # NOTE: for read-only vgrids/workgroups we need a local 'ro' bind-mount
-      - ./state/vgrid_files_writable:/home/mig/state/vgrid_files_readonly:ro
+      - type: volume
+        source: vgrid_files_readonly
+        target: /home/mig/state/vgrid_files_readonly
+        read_only: true
     command: /app/docker-entry.sh -k
 
   migrid-webdavs:
@@ -196,16 +210,19 @@ services:
         source: certs
         target: /etc/httpd/MiG-certificates
       - type: volume
-        source: state
-        target: /home/mig/state
-      - type: volume
         source: migrid-webdavs-syslog
         target: /var/log
+      - type: volume
+        source: state
+        target: /home/mig/state
       # NOTE: for read-only vgrids/workgroups we need a local 'ro' bind-mount
-      - ./state/vgrid_files_writable:/home/mig/state/vgrid_files_readonly:ro
+      - type: volume
+        source: vgrid_files_readonly
+        target: /home/mig/state/vgrid_files_readonly
+        read_only: true
     command: /app/docker-entry.sh -k
 
-# NOTE: not used in stand-alone mode
+# NOTE: not used in stand-alone "production" mode
 #  nginx-proxy:
 #    image: jwilder/nginx-proxy
 #    container_name: nginx-proxy
@@ -222,7 +239,7 @@ services:
 #    #  - "443:443"
 #    volumes:
 #      - /var/run/docker.sock:/tmp/docker.sock:ro
-#      - ./nginx-proxy-dev.erda.dk.conf:/etc/nginx/conf.d/migrid.conf
+#      - ./nginx-proxy-development.conf:/etc/nginx/conf.d/migrid.conf
 #      - ./nginx-harden-https.conf:/etc/nginx/harden-https.conf
 #      - ./certs/MiG/site/server.crt:/etc/nginx/certs/server.crt
 #      - ./certs/dhparams.pem:/etc/nginx/dhparam/dhparam.pem
@@ -245,7 +262,7 @@ volumes:
       o: bind
 
   mig:
-    # Volume used to contain the migrid code and conf (provided by migrid at svn)
+    # Volume used to contain the migrid code and conf (provided by migrid at svn/git)
     driver: local
     driver_opts:
       type: none
@@ -260,6 +277,13 @@ volumes:
       device: ${DOCKER_MIGRID_ROOT}/state
       o: bind
   
+  vgrid_files_readonly:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${DOCKER_MIGRID_ROOT}/state/vgrid_files_writable
+      o: bind,ro
+
   migrid-syslog:
     # Volume used for exposing migrid system log
     driver: local
