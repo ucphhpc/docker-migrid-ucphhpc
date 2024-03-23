@@ -34,6 +34,7 @@ services:
       service: migrid-shared
     environment:
       TZ: ${TZ}
+      MIG_SYSTEM_RUN: ${MIG_SYSTEM_RUN}
       # RUN_SERVICES specifies which daemons to launch
       # Available target service names follow migrid init script and are:
       #   httpd script monitor sshmux events cron transfers
@@ -42,7 +43,7 @@ services:
     volumes:
       - type: volume
         source: httpd
-        target: /etc/httpd/
+        target: /etc/httpd
       - type: volume
         source: mig
         target: /home/mig/mig
@@ -60,6 +61,13 @@ services:
         source: vgrid_files_readonly
         target: /home/mig/state/vgrid_files_readonly
         read_only: true
+      # NOTE: mig_system_run is a shared volatile cache which gains from using host tmpfs
+      - type: volume
+        source: mig_system_run
+        target: /home/mig/state/mig_system_run
+    # NOTE: openid_store is a volatile cache and should use fast local tmpfs
+    tmpfs:
+      - /home/mig/state/openid_store:mode=770,uid=${UID:-1000},gid=${GID:-1000}
     env_file:
       - migrid-httpd.env
     command: /app/docker-entry.sh -k -V
@@ -71,6 +79,7 @@ services:
     network_mode: "host"
     environment:
       TZ: ${TZ}
+      MIG_SYSTEM_RUN: ${MIG_SYSTEM_RUN}
       # RUN_SERVICES specifies which daemons to launch
       # Available target service names follow migrid init script and are:
       #   httpd script monitor sshmux events cron transfers
@@ -84,7 +93,7 @@ services:
     volumes:
       - type: volume
         source: httpd
-        target: /etc/httpd/
+        target: /etc/httpd
       - type: volume
         source: mig
         target: /home/mig/mig
@@ -97,11 +106,11 @@ services:
       - type: volume
         source: state
         target: /home/mig/state
-      # NOTE: for read-only vgrids/workgroups we need a local 'ro' bind-mount
+      # NOTE: we don't need read-only vgrids/workgroups in the openid container
+      # NOTE: mig_system_run is a shared volatile cache which gains from using host tmpfs
       - type: volume
-        source: vgrid_files_readonly
-        target: /home/mig/state/vgrid_files_readonly
-        read_only: true
+        source: mig_system_run
+        target: /home/mig/state/mig_system_run
     command: /app/docker-entry.sh -k
 
   migrid-sftp:
@@ -110,6 +119,7 @@ services:
     network_mode: "host"
     environment:
       TZ: ${TZ}
+      MIG_SYSTEM_RUN: ${MIG_SYSTEM_RUN}
       # RUN_SERVICES specifies which daemons to launch
       # Available target service names follow migrid init script and are:
       #   httpd script monitor sshmux events cron transfers
@@ -124,7 +134,7 @@ services:
     volumes:
       - type: volume
         source: httpd
-        target: /etc/httpd/
+        target: /etc/httpd
       - type: volume
         source: mig
         target: /home/mig/mig
@@ -142,6 +152,10 @@ services:
         source: vgrid_files_readonly
         target: /home/mig/state/vgrid_files_readonly
         read_only: true
+      # NOTE: mig_system_run is a shared volatile cache which gains from using host tmpfs
+      - type: volume
+        source: mig_system_run
+        target: /home/mig/state/mig_system_run
     command: /app/docker-entry.sh -k
 
   migrid-ftps:
@@ -150,6 +164,7 @@ services:
     network_mode: "host"
     environment:
       TZ: ${TZ}
+      MIG_SYSTEM_RUN: ${MIG_SYSTEM_RUN}
       # RUN_SERVICES specifies which daemons to launch
       # Available target service names follow migrid init script and are:
       #   httpd script monitor sshmux events cron transfers
@@ -163,7 +178,7 @@ services:
     volumes:
       - type: volume
         source: httpd
-        target: /etc/httpd/
+        target: /etc/httpd
       - type: volume
         source: mig
         target: /home/mig/mig
@@ -181,6 +196,10 @@ services:
         source: vgrid_files_readonly
         target: /home/mig/state/vgrid_files_readonly
         read_only: true
+      # NOTE: mig_system_run is a shared volatile cache which gains from using host tmpfs
+      - type: volume
+        source: mig_system_run
+        target: /home/mig/state/mig_system_run
     command: /app/docker-entry.sh -k
 
   migrid-webdavs:
@@ -189,6 +208,7 @@ services:
     network_mode: "host"
     environment:
       TZ: ${TZ}
+      MIG_SYSTEM_RUN: ${MIG_SYSTEM_RUN}
       # RUN_SERVICES specifies which daemons to launch
       # Available target service names follow migrid init script and are:
       #   httpd script monitor sshmux events cron transfers
@@ -202,7 +222,7 @@ services:
     volumes:
       - type: volume
         source: httpd
-        target: /etc/httpd/
+        target: /etc/httpd
       - type: volume
         source: mig
         target: /home/mig/mig
@@ -220,9 +240,13 @@ services:
         source: vgrid_files_readonly
         target: /home/mig/state/vgrid_files_readonly
         read_only: true
+      # NOTE: mig_system_run is a shared volatile cache which gains from using host tmpfs
+      - type: volume
+        source: mig_system_run
+        target: /home/mig/state/mig_system_run
     command: /app/docker-entry.sh -k
 
-# NOTE: not used in stand-alone "production" mode
+# NOTE: not used in stand-alone production mode
 #  nginx-proxy:
 #    image: jwilder/nginx-proxy
 #    container_name: nginx-proxy
@@ -284,8 +308,16 @@ volumes:
       device: ${DOCKER_MIGRID_ROOT}/state/vgrid_files_writable
       o: bind,ro
 
+  mig_system_run:
+    # Volume used to map a fast host disk or tmpfs into the shared cache folder
+    driver: local
+    driver_opts:
+      type: none
+      device: ${MIG_SYSTEM_RUN}
+      o: bind
+
   migrid-syslog:
-    # Volume used for exposing migrid system log
+    # Volume used for exposing migrid container system log
     driver: local
     driver_opts:
       type: none
@@ -293,7 +325,7 @@ volumes:
       o: bind
 
   migrid-io-syslog:
-    # Volume used for exposing migrid system log
+    # Volume used for exposing migrid io container system log
     driver: local
     driver_opts:
       type: none
@@ -301,7 +333,7 @@ volumes:
       o: bind
 
   migrid-openid-syslog:
-    # Volume used for exposing migrid system log
+    # Volume used for exposing migrid openid container system log
     driver: local
     driver_opts:
       type: none
@@ -309,7 +341,7 @@ volumes:
       o: bind
 
   migrid-sftp-syslog:
-    # Volume used for exposing migrid system log
+    # Volume used for exposing migrid sftp container system log
     driver: local
     driver_opts:
       type: none
@@ -317,7 +349,7 @@ volumes:
       o: bind
 
   migrid-webdavs-syslog:
-    # Volume used for exposing migrid system log
+    # Volume used for exposing migrid webdavs container system log
     driver: local
     driver_opts:
       type: none
@@ -325,7 +357,7 @@ volumes:
       o: bind
 
   migrid-ftps-syslog:
-    # Volume used for exposing migrid system log
+    # Volume used for exposing migrid ftps container system log
     driver: local
     driver_opts:
       type: none
