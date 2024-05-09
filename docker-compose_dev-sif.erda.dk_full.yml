@@ -380,10 +380,10 @@ services:
         source: ${QUOTA_LUSTRE_BASE}
         target: /lustre/${DOMAIN}
       - type: bind
-        source: ${QUOTA_GOCRYPYFS_XRAY}
+        source: ${QUOTA_GOCRYPTFS_XRAY}
         target: /usr/local/bin/gocryptfs-xray
       - type: bind
-        source: ${QUOTA_GOCRYPYFS_SOCK}
+        source: ${QUOTA_GOCRYPTFS_SOCK}
         target: /var/run/gocryptfs.${DOMAIN}.sock
       - type: volume
         source: mig
