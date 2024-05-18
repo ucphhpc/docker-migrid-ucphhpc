@@ -110,7 +110,8 @@ services:
       - type: bind
         source: ${MIG_SYSTEM_RUN}
         target: /home/mig/state/mig_system_run
-      # NOTE: openid_store is a volatile cache and should use fast local tmpfs
+      # NOTE: openid_store is a volatile state for apache mod auth openid and
+      #       gains scalability and performance from using a fast local tmpfs
       - type: bind
         source: ${OPENID_STORE}
         target: /home/mig/state/openid_store
@@ -349,14 +350,6 @@ volumes:
     driver_opts:
       type: none
       device: ${DOCKER_MIGRID_ROOT}/log/migrid
-      o: bind
-
-  migrid-io-syslog:
-    # Volume used for exposing migrid io container system log
-    driver: local
-    driver_opts:
-      type: none
-      device: ${DOCKER_MIGRID_ROOT}/log/migrid-io
       o: bind
 
   migrid-openid-syslog:
