@@ -22,7 +22,7 @@ services:
   #       while lustre is mounted.
   migrid-volume-init:
     container_name: migrid-volume-init
-    image: ucphhpc/migrid${CONTAINER_TAG}
+    image: ${CONTAINER_REGISTRY}/ucphhpc/migrid${CONTAINER_TAG}
     network_mode: "host"
     extends:
       file: docker-compose_shared.yml
@@ -69,7 +69,7 @@ services:
 
   migrid:
     container_name: migrid
-    image: ucphhpc/migrid${CONTAINER_TAG}
+    image: ${CONTAINER_REGISTRY}/ucphhpc/migrid${CONTAINER_TAG}
     network_mode: "host"
     extends:
       file: docker-compose_shared.yml
@@ -122,7 +122,7 @@ services:
   # Multiple containers with individual daemons not provided by base migrid
   migrid-openid:
     container_name: migrid-openid
-    image: ucphhpc/migrid${CONTAINER_TAG}
+    image: ${CONTAINER_REGISTRY}/ucphhpc/migrid${CONTAINER_TAG}
     network_mode: "host"
     environment:
       TZ: ${TZ}
@@ -161,7 +161,7 @@ services:
 
   migrid-sftp:
     container_name: migrid-sftp
-    image: ucphhpc/migrid${CONTAINER_TAG}
+    image: ${CONTAINER_REGISTRY}/ucphhpc/migrid${CONTAINER_TAG}
     network_mode: "host"
     # NOTE: sshd requires capability to write audit log on login attempts
     cap_add:
@@ -208,7 +208,7 @@ services:
 
   migrid-ftps:
     container_name: migrid-ftps
-    image: ucphhpc/migrid${CONTAINER_TAG}
+    image: ${CONTAINER_REGISTRY}/ucphhpc/migrid${CONTAINER_TAG}
     network_mode: "host"
     environment:
       TZ: ${TZ}
@@ -251,7 +251,7 @@ services:
 
   migrid-webdavs:
     container_name: migrid-webdavs
-    image: ucphhpc/migrid${CONTAINER_TAG}
+    image: ${CONTAINER_REGISTRY}/ucphhpc/migrid${CONTAINER_TAG}
     network_mode: "host"
     environment:
       TZ: ${TZ}
@@ -291,6 +291,34 @@ services:
         source: ${MIG_SYSTEM_RUN}
         target: /home/mig/state/mig_system_run
     command: /app/docker-entry.sh -k
+
+  migrid-lustre-quota:
+    container_name: migrid-lustre-quota
+    image: ${CONTAINER_REGISTRY}/ucphhpc/migrid${CONTAINER_TAG}
+    network_mode: "host"
+    environment:
+      TZ: ${TZ}
+    depends_on:
+      - migrid
+    cap_add:
+      - SYS_ADMIN
+    volumes:
+      - type: bind
+        source: ${QUOTA_LUSTRE_BASE}
+        target: /lustre/${DOMAIN}
+      - type: bind
+        source: ${QUOTA_GOCRYPTFS_XRAY}
+        target: /usr/local/bin/gocryptfs-xray
+      - type: bind
+        source: ${QUOTA_GOCRYPTFS_SOCK}
+        target: /var/run/gocryptfs.${DOMAIN}.sock
+      - type: volume
+        source: mig
+        target: /home/mig/mig
+      - type: volume
+        source: state
+        target: /home/mig/state
+    command: miglustrequota.py -c /home/mig/mig/server/MiGserver.conf
 
 # NOTE: not used in stand-alone production mode
 #  nginx-proxy:
